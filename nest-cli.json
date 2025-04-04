@@ -1,0 +1,48 @@
+{
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "apps/pdf-service/src",
+  "projects": {
+    "boat": {
+      "type": "library",
+      "root": "libs/boat",
+      "entryFile": "index",
+      "sourceRoot": "libs/boat/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/boat/tsconfig.lib.json"
+      }
+    },
+    "pdf-worker": {
+      "type": "library",
+      "root": "libs/pdf-worker",
+      "entryFile": "index",
+      "sourceRoot": "libs/pdf-worker/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/pdf-worker/tsconfig.lib.json"
+      }
+    },
+    "pdf-service": {
+      "type": "application",
+      "root": "apps/pdf-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/pdf-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/pdf-service/tsconfig.app.json"
+      }
+    },
+    "serverless": {
+      "type": "library",
+      "root": "libs/serverless",
+      "entryFile": "index",
+      "sourceRoot": "libs/serverless/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/serverless/tsconfig.lib.json"
+      }
+    }
+  },
+  "monorepo": true,
+  "root": "apps/pdf-service",
+  "compilerOptions": {
+    "webpack": false,
+    "tsConfigPath": "apps/tsconfig.app.json"
+  }
+}

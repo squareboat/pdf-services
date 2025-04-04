@@ -1,0 +1,13 @@
+func:
+  name: pdf-services
+  timeout: 29
+  memorySize: 2048
+  ephemeralStorageSize: 2048
+  image: pdf-services-image
+  # handler: dist/apps/pdf-service/src/main.handler
+
+  events:
+    - http:
+        path: pdf/generate
+        method: post
+        timeout: 29

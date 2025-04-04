@@ -1,0 +1,32 @@
+service: pdf-services
+useDotenv: true
+
+plugins:
+  - serverless-plugin-optimize
+  - serverless-offline
+  - serverless-dotenv-plugin
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: production
+  logRetentionInDays: 5
+  environment: ${file(./infra/env.yml):environment}
+  logs:
+    restApi: true
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            - "s3:GetObject"
+            - "s3:PutObject"
+          Resource:
+            - "arn:aws:s3:::${self:provider.environment.APP_AWS_S3_BUCKET}/*"
+  ecr:
+    images:
+      pdf-services-image:
+        path: ./
+
+functions:
+  pdf-service: ${file(./apps/pdf-service/serverless.yml):func}
