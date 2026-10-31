@@ -13,7 +13,7 @@ export interface PDFWorkerAsyncOptionsFactory {
 
 export interface PdfWorkerAsyncOptions extends Pick<ModuleMetadata, "imports"> {
   name?: string;
-  useExisting?: Type<PDFWorkerOptions>;
+  useExisting?: Type<PDFWorkerAsyncOptionsFactory>;
   useClass?: Type<PDFWorkerAsyncOptionsFactory>;
   useFactory?: (...args: any[]) => Promise<PDFWorkerOptions> | PDFWorkerOptions;
   inject?: any[];
