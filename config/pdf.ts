@@ -11,6 +11,7 @@ export default registerAs("pdf", () => ({
   moduleSettings: {
     default: "docs",
     isLocal: process.env.NODE_ENV === "local",
+    chromiumPath: process.env.CHROMIUM_PATH,
     variants: {
       docs: {
         pdfOption: {

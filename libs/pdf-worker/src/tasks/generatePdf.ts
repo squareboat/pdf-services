@@ -66,7 +66,7 @@ export class GeneratePdf {
 
   async getBrowser(): Promise<Browser> {
     const executablePath = this.options.isLocal
-      ? "/opt/homebrew/bin/chromium"
+      ? this.options.chromiumPath || "/opt/homebrew/bin/chromium"
       : await chromium.executablePath();
 
     // @sparticuz/chromium 137+ no longer exports `headless`/`defaultViewport`;
