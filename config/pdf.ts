@@ -18,7 +18,8 @@ export default registerAs("pdf", () => ({
           format: "legal",
           margin: defaultMargin,
           printBackground: true,
-          scale: +process.env.PDF_SCALE,
+          // Chrome rejects NaN, so fall back to 1 when PDF_SCALE is not set
+          scale: +process.env.PDF_SCALE || 1,
         },
         compress: true,
       },
