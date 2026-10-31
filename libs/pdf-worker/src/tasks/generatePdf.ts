@@ -20,8 +20,9 @@ export class GeneratePdf {
     const browser = await this.getBrowser();
     try {
       const page = await browser.newPage();
-      // puppeteer 22+ setContent() only waits for load/domcontentloaded;
-      // wait for the network separately, as networkidle2 did before
+      // puppeteer's types leave networkidle0/2 out of setContent()'s waitUntil
+      // (the CDP implementation still accepts them), so wait for the network
+      // separately: same effect as the old networkidle2
       await page.setContent(html, { waitUntil: ["domcontentloaded", "load"] });
       await page.waitForNetworkIdle({ concurrency: 2, idleTime: 500 });
 
