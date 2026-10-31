@@ -27,4 +27,7 @@ export default registerAs("pdf", () => ({
     },
   },
   variants: ["docs"],
+  // Largest JSON request body accepted (Express defaults to 100kb). HTML with
+  // inline CSS/images is often bigger. Lambda caps a synchronous request at 6 MB.
+  maxBodySize: process.env.PDF_MAX_BODY || "5mb",
 }));

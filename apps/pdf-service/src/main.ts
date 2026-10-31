@@ -4,6 +4,7 @@ import { createServer, proxy } from "aws-serverless-express";
 import { eventContext } from "aws-serverless-express/middleware";
 
 import { NestFactory } from "@nestjs/core";
+import { ConfigService } from "@nestjs/config";
 import {
   ExpressAdapter,
   NestExpressApplication,
@@ -21,6 +22,9 @@ async function bootstrapServer(): Promise<Server> {
       PDFGeneratorModule,
       new ExpressAdapter()
     );
+    nestApp.useBodyParser("json", {
+      limit: nestApp.get(ConfigService).get<string>("pdf.maxBodySize"),
+    });
     nestApp.useGlobalGuards(new AttachHelpersGuard());
     nestApp.use(eventContext());
     await nestApp.init();
