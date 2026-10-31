@@ -5,8 +5,8 @@ export default registerAs("storage", () => ({
     original: {
       driver: "s3",
       bucket: process.env.APP_AWS_S3_BUCKET,
-      key: process.env.APP_AWS_KEY,
-      secret: process.env.APP_AWS_SECRET,
+      accessKey: process.env.APP_AWS_KEY,
+      secretKey: process.env.APP_AWS_SECRET,
       region: process.env.APP_AWS_REGION,
     },
   },
