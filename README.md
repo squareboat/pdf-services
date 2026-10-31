@@ -3,8 +3,12 @@
 This repository provides a PDF generation service that converts HTML code to PDF. It is designed to be deployed on AWS Lambda and requires specific AWS permissions as outlined in `permissions.md`.
 
 ### Requirements:
+- Node.js 24 (24.15 or newer). The Lambda runtime is `nodejs24.x`.
 - AWS account with appropriate permissions (see `permissions.md`)
-- Serverless framework installed
+- Serverless framework v4 (a dev dependency, so `npx sls ...` works)
+
+### Development:
+- `npm run build`, `npm run lint`, `npm test`
 
 ### Deployment:
 To deploy this service to AWS Lambda, use the command: `serverless deploy`

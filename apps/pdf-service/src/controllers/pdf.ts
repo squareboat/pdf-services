@@ -2,11 +2,11 @@ import { Controller, Post, Req, Res } from "@nestjs/common";
 import { PdfService } from "../services/service";
 import {
   RestController,
-  Request,
-  Response,
+  type Request,
+  type Response,
   Validate,
   Dto,
-} from "libs/boat/src";
+} from "@libs/boat";
 import { GeneratePdfDto } from "@libs/pdf-worker";
 
 @Controller()

@@ -1,5 +1,5 @@
 import { ModuleMetadata, Type } from "@nestjs/common";
-import { PDFOptions } from "puppeteer-core";
+import type { PDFOptions } from "puppeteer-core";
 
 export interface PDFWorkerOptions {
   default: string;

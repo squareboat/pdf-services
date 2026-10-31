@@ -1,7 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { spawnSync } from "child_process";
 import { readFileSync, unlinkSync, writeFileSync } from "fs";
-import { PDFWorkerOptions } from "../interfaces/option";
+import type { PDFWorkerOptions } from "../interfaces/option";
 import { PDF_WORKER_OPTIONS } from "../constants";
 import { MathHelpers } from "@libs/boat";
 

@@ -10,4 +10,3 @@ func:
     - http:
         path: pdf/generate
         method: post
-        timeout: 29
