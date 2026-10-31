@@ -2,13 +2,11 @@ service: pdf-services
 useDotenv: true
 
 plugins:
-  - serverless-plugin-optimize
   - serverless-offline
-  - serverless-dotenv-plugin
 
 provider:
   name: aws
-  runtime: nodejs18.x
+  runtime: nodejs24.x
   stage: production
   logRetentionInDays: 5
   environment: ${file(./infra/env.yml):environment}

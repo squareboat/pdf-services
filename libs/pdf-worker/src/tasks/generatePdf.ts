@@ -2,11 +2,10 @@ import { Inject, Injectable } from "@nestjs/common";
 import { GeneratePdfDto, S3ConfigDto } from "../dto";
 import { CompressPdf } from "./compressPdf";
 import { PDF_WORKER_OPTIONS } from "../constants";
-import { PDFWorkerOptions } from "../interfaces/option";
+import type { PDFWorkerOptions } from "../interfaces/option";
 import { Storage } from "@squareboat/nest-storage";
-
-const puppeteer = require("puppeteer-core");
-const chromium = require("@sparticuz/chromium");
+import puppeteer, { type Browser, type Page } from "puppeteer-core";
+import chromium from "@sparticuz/chromium";
 
 @Injectable()
 export class GeneratePdf {
@@ -15,22 +14,26 @@ export class GeneratePdf {
   ) {}
 
   async handle(inputs: GeneratePdfDto): Promise<Buffer> {
-    const browser = await this.getBrowser();
-    const page = await browser.newPage();
     const html = await this.getHtml(inputs);
     if (!html) return;
 
-    await page.setContent(html, {
-      waitUntil: ["domcontentloaded", "networkidle2", "load"],
-    });
+    const browser = await this.getBrowser();
+    try {
+      const page = await browser.newPage();
+      // puppeteer's types leave networkidle0/2 out of setContent()'s waitUntil
+      // (the CDP implementation still accepts them), so wait for the network
+      // separately: same effect as the old networkidle2
+      await page.setContent(html, { waitUntil: ["domcontentloaded", "load"] });
+      await page.waitForNetworkIdle({ concurrency: 2, idleTime: 500 });
 
-    let pdf = await this.generatePdf(inputs, page);
+      const pdf = await this.generatePdf(inputs, page);
+      if (!pdf) return;
 
-    if (!pdf || typeof pdf === "string") return;
-
-    await browser.close();
-
-    return pdf;
+      // puppeteer 22+ returns a Uint8Array
+      return Buffer.from(pdf);
+    } finally {
+      await browser.close();
+    }
   }
 
   async storePdf(
@@ -53,10 +56,7 @@ export class GeneratePdf {
     return await compressTask.handle(pdf);
   }
 
-  async generatePdf(
-    inputs: GeneratePdfDto,
-    page: any
-  ): Promise<string | void | Buffer> {
+  async generatePdf(inputs: GeneratePdfDto, page: Page): Promise<Uint8Array> {
     const variant = inputs.pdfVariant || this.options.default;
     return page.pdf({
       ...this.options.variants[variant].pdfOption,
@@ -65,17 +65,30 @@ export class GeneratePdf {
     });
   }
 
-  async getBrowser() {
+  async getBrowser(): Promise<Browser> {
     const executablePath = this.options.isLocal
-      ? "/opt/homebrew/bin/chromium"
+      ? this.options.chromiumPath || "/opt/homebrew/bin/chromium"
       : await chromium.executablePath();
 
+    // @sparticuz/chromium 137+ no longer exports `headless`/`defaultViewport`;
+    // it is a headless shell build, so launch it with headless: "shell".
     return await puppeteer.launch({
-      headless: chromium.headless,
-      args: [...chromium.args, "--single-process", "--disable-dev-shm-usage"],
-      defaultViewport: chromium.defaultViewport,
+      headless: "shell",
+      args: await puppeteer.defaultArgs({
+        args: [...chromium.args, "--single-process", "--disable-dev-shm-usage"],
+        headless: "shell",
+      }),
+      // the viewport @sparticuz/chromium used to export as `defaultViewport`
+      defaultViewport: {
+        deviceScaleFactor: 1,
+        hasTouch: false,
+        height: 1080,
+        isLandscape: true,
+        isMobile: false,
+        width: 1920,
+      },
       executablePath: executablePath,
-      ignoreHTTPSErrors: true,
+      acceptInsecureCerts: true,
     });
   }
 

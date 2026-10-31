@@ -11,6 +11,7 @@ export default registerAs("pdf", () => ({
   moduleSettings: {
     default: "docs",
     isLocal: process.env.NODE_ENV === "local",
+    chromiumPath: process.env.CHROMIUM_PATH,
     variants: {
       docs: {
         pdfOption: {
@@ -18,11 +19,15 @@ export default registerAs("pdf", () => ({
           format: "legal",
           margin: defaultMargin,
           printBackground: true,
-          scale: +process.env.PDF_SCALE,
+          // Chrome rejects NaN, so fall back to 1 when PDF_SCALE is not set
+          scale: +process.env.PDF_SCALE || 1,
         },
         compress: true,
       },
     },
   },
   variants: ["docs"],
+  // Largest JSON request body accepted (Express defaults to 100kb). HTML with
+  // inline CSS/images is often bigger. Lambda caps a synchronous request at 6 MB.
+  maxBodySize: process.env.PDF_MAX_BODY || "5mb",
 }));

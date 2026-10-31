@@ -1,9 +1,11 @@
 import { ModuleMetadata, Type } from "@nestjs/common";
-import { PDFOptions } from "puppeteer-core";
+import type { PDFOptions } from "puppeteer-core";
 
 export interface PDFWorkerOptions {
   default: string;
   isLocal: boolean;
+  /** Chromium binary used when `isLocal` is true (defaults to /opt/homebrew/bin/chromium) */
+  chromiumPath?: string;
   variants: { [key: string]: { pdfOption: PDFOptions; compress?: boolean } };
 }
 
@@ -13,7 +15,7 @@ export interface PDFWorkerAsyncOptionsFactory {
 
 export interface PdfWorkerAsyncOptions extends Pick<ModuleMetadata, "imports"> {
   name?: string;
-  useExisting?: Type<PDFWorkerOptions>;
+  useExisting?: Type<PDFWorkerAsyncOptionsFactory>;
   useClass?: Type<PDFWorkerAsyncOptionsFactory>;
   useFactory?: (...args: any[]) => Promise<PDFWorkerOptions> | PDFWorkerOptions;
   inject?: any[];

@@ -16,7 +16,7 @@ export class PDFGeneratorLibModule {
    * Register options
    * @param options
    */
-  static register(options: NotificationOptions): DynamicModule {
+  static register(options: PDFWorkerOptions): DynamicModule {
     return {
       global: false,
       module: PDFGeneratorLibModule,
@@ -38,12 +38,15 @@ export class PDFGeneratorLibModule {
     return {
       global: false,
       module: PDFGeneratorLibModule,
-      imports: [],
+      imports: options.imports || [],
       providers: [
         PDFWorkerService,
         GeneratePdf,
         CompressPdf,
         this.createPdfWorkerOptionsProvider(options),
+        ...(options.useClass
+          ? [{ provide: options.useClass, useClass: options.useClass }]
+          : []),
       ],
       exports: [PDFWorkerService],
     };
@@ -61,7 +64,8 @@ export class PDFGeneratorLibModule {
     }
 
     const inject = [
-      (options.useClass || options.useExisting) as Type<PDFWorkerOptions>,
+      (options.useClass ||
+        options.useExisting) as Type<PDFWorkerAsyncOptionsFactory>,
     ];
 
     return {

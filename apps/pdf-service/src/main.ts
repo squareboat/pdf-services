@@ -1,14 +1,16 @@
-import { Handler, Context } from "aws-lambda";
+import type { Handler, Context } from "aws-lambda";
 import { Server } from "http";
 import { createServer, proxy } from "aws-serverless-express";
 import { eventContext } from "aws-serverless-express/middleware";
 
 import { NestFactory } from "@nestjs/core";
-import { ExpressAdapter } from "@nestjs/platform-express";
+import { ConfigService } from "@nestjs/config";
+import {
+  ExpressAdapter,
+  NestExpressApplication,
+} from "@nestjs/platform-express";
 import { PDFGeneratorModule } from "./module";
 import { AttachHelpersGuard } from "@libs/boat";
-
-const express = require("express");
 
 const binaryMimeTypes: string[] = [];
 
@@ -16,14 +18,17 @@ let cachedServer: Server;
 
 async function bootstrapServer(): Promise<Server> {
   if (!cachedServer) {
-    const expressApp = express();
-    const nestApp = await NestFactory.create(
+    const nestApp = await NestFactory.create<NestExpressApplication>(
       PDFGeneratorModule,
-      new ExpressAdapter(expressApp)
+      new ExpressAdapter()
     );
+    nestApp.useBodyParser("json", {
+      limit: nestApp.get(ConfigService).get<string>("pdf.maxBodySize"),
+    });
     nestApp.useGlobalGuards(new AttachHelpersGuard());
     nestApp.use(eventContext());
     await nestApp.init();
+    const expressApp = nestApp.getHttpAdapter().getInstance();
     cachedServer = createServer(expressApp, undefined, binaryMimeTypes);
   }
   return cachedServer;

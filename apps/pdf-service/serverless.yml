@@ -4,10 +4,9 @@ func:
   memorySize: 2048
   ephemeralStorageSize: 2048
   image: pdf-services-image
-  # handler: dist/apps/pdf-service/src/main.handler
+  # handler: dist/apps/pdf-service/src/main.handler  # zip deploy: needs NODE_OPTIONS from infra env.yml
 
   events:
     - http:
         path: pdf/generate
         method: post
-        timeout: 29
